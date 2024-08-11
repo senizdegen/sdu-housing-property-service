@@ -1,0 +1,12 @@
+is_debug: true
+listen:
+  type: port
+  bind_ip: 0.0.0.0
+  port: 10002
+mongodb:
+  host: localhost
+  port: 27017
+  username: senizdegen
+  auth_db: sh-property
+  database: sh-property
+  collection: property
