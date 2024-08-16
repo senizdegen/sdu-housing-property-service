@@ -1,7 +1,10 @@
 package property
 
 import (
+	"net/http"
+
 	"github.com/julienschmidt/httprouter"
+	"github.com/senizdegen/sdu-housing/property-service/internal/apperror"
 	"github.com/senizdegen/sdu-housing/property-service/pkg/logging"
 )
 
@@ -16,7 +19,9 @@ type Handler struct {
 }
 
 func (h *Handler) Register(router *httprouter.Router) {
-	//register
+	router.HandlerFunc(http.MethodPost, propertyURL, apperror.Middleware(h.CreateProperty))
 }
 
-//handler methods
+func (h *Handler) CreateProperty(w http.ResponseWriter, r *http.Request) error {
+	return nil
+}
