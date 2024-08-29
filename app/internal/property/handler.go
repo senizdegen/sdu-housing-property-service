@@ -9,8 +9,8 @@ import (
 )
 
 const (
-	propertyURL  = "/api/property"
-	propertysURL = "/api/property/:uuid"
+	propertysURL = "/api/property"
+	propertyURL  = "/api/property/:uuid"
 )
 
 type Handler struct {
@@ -19,9 +19,29 @@ type Handler struct {
 }
 
 func (h *Handler) Register(router *httprouter.Router) {
-	router.HandlerFunc(http.MethodPost, propertyURL, apperror.Middleware(h.CreateProperty))
+	router.HandlerFunc(http.MethodPost, propertysURL, apperror.Middleware(h.CreateProperty))
+	router.HandlerFunc(http.MethodGet, propertyURL, apperror.Middleware(h.GetPropertyById))
+	router.HandlerFunc(http.MethodGet, propertysURL, apperror.Middleware(h.GetAllProperty))
+	router.HandlerFunc(http.MethodPut, propertyURL, apperror.Middleware(h.UpdateProperty))
+	router.HandlerFunc(http.MethodDelete, propertyURL, apperror.Middleware(h.DeleteProperty))
 }
 
 func (h *Handler) CreateProperty(w http.ResponseWriter, r *http.Request) error {
+	return nil
+}
+
+func (h *Handler) GetPropertyById(w http.ResponseWriter, r *http.Request) error {
+	return nil
+}
+
+func (h *Handler) GetAllProperty(w http.ResponseWriter, r *http.Request) error {
+	return nil
+}
+
+func (h *Handler) UpdateProperty(w http.ResponseWriter, r *http.Request) error {
+	return nil
+}
+
+func (h *Handler) DeleteProperty(w http.ResponseWriter, r *http.Request) error {
 	return nil
 }

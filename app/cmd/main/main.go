@@ -40,6 +40,7 @@ func main() {
 		logger.Fatal(err)
 	}
 
+	logger.Debug(mongoClient)
 	propertyStorage := db.NewStorage(mongoClient, cfg.MongoDB.Collection, logger)
 
 	propertyService, err := property.NewService(propertyStorage, logger)
@@ -53,5 +54,5 @@ func main() {
 	}
 
 	propertyHandler.Register(router)
-
+	logger.Info("finished successfully")
 }

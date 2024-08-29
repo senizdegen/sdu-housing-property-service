@@ -11,8 +11,8 @@ type Property struct {
 	Bedrooms    int       `bson:"bedrooms,omitempty" json:"bedrooms,omitempty"`
 	Bathrooms   int       `bson:"bathrooms,omitempty" json:"bathrooms,omitempty"`
 	Images      []string  `bson:"images,omitempty" json:"images,omitempty"` // Массив ссылок на изображения
-	CreatedAt   time.Time `bson:"createdAt,omitempty" json:"createdAt,omitempty"`
-	UpdatedAt   time.Time `bson:"updatedAt,omitempty" json:"updatedAt,omitempty"`
+	CreatedAt   time.Time `bson:"created_at,omitempty" json:"created_at,omitempty"`
+	UpdatedAt   time.Time `bson:"updated_at,omitempty" json:"updated_at,omitempty"`
 }
 
 type CreatePropertyDTO struct {
