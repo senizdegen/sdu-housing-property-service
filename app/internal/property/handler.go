@@ -1,6 +1,8 @@
 package property
 
 import (
+	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/julienschmidt/httprouter"
@@ -35,6 +37,23 @@ func (h *Handler) GetPropertyById(w http.ResponseWriter, r *http.Request) error 
 }
 
 func (h *Handler) GetAllProperty(w http.ResponseWriter, r *http.Request) error {
+	h.Logger.Info("GET ALL PROPERTY")
+	w.Header().Set("Content-Type", "application/json")
+
+	property, err := h.PropertyService.GetMany(r.Context())
+	if err != nil {
+		return err
+	}
+
+	h.Logger.Debug("marshal property")
+	propertyBytes, err := json.Marshal(property)
+	if err != nil {
+		return fmt.Errorf("failed to marshal property. err: %w", err)
+	}
+
+	w.WriteHeader(http.StatusOK)
+	w.Write(propertyBytes)
+
 	return nil
 }
 

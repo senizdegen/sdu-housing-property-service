@@ -1,6 +1,8 @@
 package property
 
 import (
+	"context"
+
 	"github.com/senizdegen/sdu-housing/property-service/pkg/logging"
 )
 
@@ -19,4 +21,9 @@ func NewService(propertyStorage Storage, logger logging.Logger) (Service, error)
 }
 
 type Service interface {
+	GetMany(ctx context.Context) ([]Property, error)
+}
+
+func (s *service) GetMany(ctx context.Context) ([]Property, error) {
+	return nil, nil
 }
