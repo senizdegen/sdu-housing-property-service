@@ -2,7 +2,10 @@ package property
 
 import (
 	"context"
+	"errors"
+	"fmt"
 
+	"github.com/senizdegen/sdu-housing/property-service/internal/apperror"
 	"github.com/senizdegen/sdu-housing/property-service/pkg/logging"
 )
 
@@ -25,5 +28,14 @@ type Service interface {
 }
 
 func (s *service) GetMany(ctx context.Context) ([]Property, error) {
-	return nil, nil
+	property, err := s.storage.FindMany(ctx)
+
+	if err != nil {
+		if errors.Is(err, apperror.ErrNotFound) {
+			return nil, err
+		}
+		return nil, fmt.Errorf("failed to find many property. error: %w", err)
+	}
+
+	return property, nil
 }
