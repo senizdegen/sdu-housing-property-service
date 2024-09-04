@@ -2,11 +2,13 @@ package db
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/senizdegen/sdu-housing/property-service/internal/property"
 	"github.com/senizdegen/sdu-housing/property-service/pkg/logging"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -57,4 +59,20 @@ func (s *db) FindMany(ctx context.Context) ([]property.Property, error) {
 
 	s.logger.Debug("achieved")
 	return properties, nil
+}
+
+func (s *db) Create(ctx context.Context, property property.Property) (string, error) {
+	nCtx, cancel := context.WithTimeout(ctx, time.Second*5)
+	defer cancel()
+
+	result, err := s.collection.InsertOne(nCtx, property)
+	if err != nil {
+		return "", fmt.Errorf("failed to execute query. error: %s", err)
+	}
+
+	oid, ok := result.InsertedID.(primitive.ObjectID)
+	if ok {
+		return oid.Hex(), nil
+	}
+	return "", fmt.Errorf("failed to convert object id to hex")
 }

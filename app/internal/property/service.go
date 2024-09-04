@@ -25,6 +25,7 @@ func NewService(propertyStorage Storage, logger logging.Logger) (Service, error)
 
 type Service interface {
 	GetMany(ctx context.Context) ([]Property, error)
+	Create(ctx context.Context, dto CreatePropertyDTO) (string, error)
 }
 
 func (s *service) GetMany(ctx context.Context) ([]Property, error) {
@@ -38,4 +39,18 @@ func (s *service) GetMany(ctx context.Context) ([]Property, error) {
 	}
 
 	return property, nil
+}
+
+func (s *service) Create(ctx context.Context, dto CreatePropertyDTO) (propertyUUID string, err error) {
+	//validate
+
+	property := NewProperty(dto)
+	propertyUUID, err = s.storage.Create(ctx, property)
+	if err != nil {
+		if errors.Is(err, apperror.ErrNotFound) {
+			return propertyUUID, err
+		}
+		return propertyUUID, fmt.Errorf("failed to create property. error: %w", err)
+	}
+	return propertyUUID, nil
 }

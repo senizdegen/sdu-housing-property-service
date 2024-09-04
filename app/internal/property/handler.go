@@ -29,6 +29,24 @@ func (h *Handler) Register(router *httprouter.Router) {
 }
 
 func (h *Handler) CreateProperty(w http.ResponseWriter, r *http.Request) error {
+	h.Logger.Info("CREATE PROPERTY")
+	w.Header().Set("Content-Type", "application/json")
+
+	h.Logger.Debug("decode create property dto")
+	var crProperty CreatePropertyDTO
+	defer r.Body.Close()
+
+	if err := json.NewDecoder(r.Body).Decode(&crProperty); err != nil {
+		return apperror.BadRequestError("invalid JSON scheme. check swagger API")
+	}
+	propertyUUID, err := h.PropertyService.Create(r.Context(), crProperty)
+	if err != nil {
+		return err
+	}
+
+	w.Header().Set("Location", fmt.Sprintf("%s/%s", propertyURL, propertyUUID))
+	w.WriteHeader(http.StatusCreated)
+
 	return nil
 }
 
