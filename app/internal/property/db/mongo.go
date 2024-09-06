@@ -2,9 +2,11 @@ package db
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
+	"github.com/senizdegen/sdu-housing/property-service/internal/apperror"
 	"github.com/senizdegen/sdu-housing/property-service/internal/property"
 	"github.com/senizdegen/sdu-housing/property-service/pkg/logging"
 	"go.mongodb.org/mongo-driver/bson"
@@ -59,6 +61,32 @@ func (s *db) FindMany(ctx context.Context) ([]property.Property, error) {
 
 	s.logger.Debug("achieved")
 	return properties, nil
+}
+
+func (s *db) FindOne(ctx context.Context, uuid string) (p property.Property, err error) {
+	objectID, err := primitive.ObjectIDFromHex(uuid)
+	if err != nil {
+		return p, fmt.Errorf("failed to convert hex to objectid. error: %w", err)
+	}
+
+	filter := bson.M{"_id": objectID}
+
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+
+	result := s.collection.FindOne(ctx, filter)
+	if result.Err() != nil {
+		s.logger.Error(result.Err())
+		if errors.Is(result.Err(), mongo.ErrNoDocuments) {
+			return p, apperror.ErrNotFound
+		}
+		return p, fmt.Errorf("failed to execute query. error: %w", err)
+	}
+	if err = result.Decode(&p); err != nil {
+		return p, fmt.Errorf("failed to decode document. error: %w", err)
+	}
+
+	return p, nil
 }
 
 func (s *db) Create(ctx context.Context, property property.Property) (string, error) {

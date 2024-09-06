@@ -51,6 +51,26 @@ func (h *Handler) CreateProperty(w http.ResponseWriter, r *http.Request) error {
 }
 
 func (h *Handler) GetPropertyById(w http.ResponseWriter, r *http.Request) error {
+	h.Logger.Info("GET PROPERTY BY ID")
+	w.Header().Set("Content-Type", "application/json")
+
+	params := httprouter.ParamsFromContext(r.Context())
+	uuid := params.ByName("uuid")
+
+	property, err := h.PropertyService.GetOne(r.Context(), uuid)
+	if err != nil {
+		return err
+	}
+
+	h.Logger.Debug("marshal property")
+	propertyBytes, err := json.Marshal(property)
+	if err != nil {
+		return fmt.Errorf("failed to marshal property. err: %w", err)
+	}
+
+	w.WriteHeader(http.StatusOK)
+	w.Write(propertyBytes)
+
 	return nil
 }
 

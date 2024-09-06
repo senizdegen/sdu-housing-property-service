@@ -25,6 +25,7 @@ func NewService(propertyStorage Storage, logger logging.Logger) (Service, error)
 
 type Service interface {
 	GetMany(ctx context.Context) ([]Property, error)
+	GetOne(ctx context.Context, uuid string) (Property, error)
 	Create(ctx context.Context, dto CreatePropertyDTO) (string, error)
 }
 
@@ -36,6 +37,18 @@ func (s *service) GetMany(ctx context.Context) ([]Property, error) {
 			return nil, err
 		}
 		return nil, fmt.Errorf("failed to find many property. error: %w", err)
+	}
+
+	return property, nil
+}
+
+func (s *service) GetOne(ctx context.Context, uuid string) (property Property, err error) {
+	property, err = s.storage.FindOne(ctx, uuid)
+	if err != nil {
+		if errors.Is(err, apperror.ErrNotFound) {
+			return property, err
+		}
+		return property, fmt.Errorf("failed to find one property. error: %w", err)
 	}
 
 	return property, nil

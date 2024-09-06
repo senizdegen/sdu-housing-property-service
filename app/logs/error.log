@@ -1,2 +1,0 @@
-time="2024-08-11T14:30:20+05:00" level=fatal msg="field \"Host\" is required but the value is not provided" func="config.go:50" file="github.com/senizdegen/sdu-housing/property-service/internal/config.GetConfig.func1()"
-time="2024-08-29T10:46:41+05:00" level=fatal msg="failed to create client to mongodb due to error: connection() error occurred during connection handshake: auth error: sasl conversation error: unable to authenticate using mechanism \"SCRAM-SHA-1\": (AuthenticationFailed) Authentication failed." func="main.go:40" file="main.main()"
