@@ -20,12 +20,14 @@ var _ property.Storage = &db{}
 type db struct {
 	collection *mongo.Collection
 	logger     logging.Logger
+	cache      RedisCache
 }
 
-func NewStorage(storage *mongo.Database, collection string, logger logging.Logger) property.Storage {
+func NewStorage(storage *mongo.Database, collection string, cache RedisCache, logger logging.Logger) property.Storage {
 	return &db{
 		collection: storage.Collection(collection),
 		logger:     logger,
+		cache:      cache,
 	}
 }
 
@@ -40,7 +42,7 @@ func (s *db) FindMany(ctx context.Context) ([]property.Property, error) {
 	findOptions.SetLimit(5)
 	//Define an array in which you can store the decoded documents
 
-	cursor, err := s.collection.Find(ctx, bson.D{}, findOptions) //???
+	cursor, err := s.collection.Find(ctx, bson.D{}, findOptions)
 	if err != nil {
 		return nil, err
 	}

@@ -19,6 +19,7 @@ import (
 	"github.com/senizdegen/sdu-housing/property-service/pkg/handlers/metric"
 	"github.com/senizdegen/sdu-housing/property-service/pkg/logging"
 	mongo "github.com/senizdegen/sdu-housing/property-service/pkg/mongodb"
+	"github.com/senizdegen/sdu-housing/property-service/pkg/redis"
 	"github.com/senizdegen/sdu-housing/property-service/pkg/shutdown"
 )
 
@@ -50,9 +51,23 @@ func main() {
 		logger.Fatal(err)
 	}
 
-	logger.Debug(mongoClient)
-	propertyStorage := db.NewStorage(mongoClient, cfg.MongoDB.Collection, logger)
+	logger.Println("connected to mongo")
+	logger.Trace(mongoClient)
 
+	redisClient, err := redis.NewClient(
+		fmt.Sprintf("%s:%s", cfg.Redis.Host, cfg.Redis.Port),
+		cfg.Redis.Password,
+		logger,
+	)
+	if err != nil {
+		logger.Fatal(err)
+	}
+	logger.Trace(redisClient)
+	logger.Println("connected to redis")
+
+	redisCache := db.NewRedisCache(redisClient, logger)
+
+	propertyStorage := db.NewStorage(mongoClient, cfg.MongoDB.Collection, redisCache, logger)
 	propertyService, err := property.NewService(propertyStorage, logger)
 	if err != nil {
 		logger.Fatal(err)

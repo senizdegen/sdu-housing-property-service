@@ -10,3 +10,6 @@ mongodb:
   auth_db: sh-property
   database: sh-property
   collection: property
+redis:
+  host: localhost
+  port: 6379

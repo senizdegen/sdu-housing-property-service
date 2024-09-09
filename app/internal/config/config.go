@@ -13,6 +13,7 @@ type Config struct {
 	IsDebug *bool `yaml:"is_debug"`
 	Listen  `yaml:"listen"`
 	MongoDB `yaml:"mongodb" env-required:"true"`
+	Redis   `yaml:"redis" env-required:"true"`
 }
 
 type Listen struct {
@@ -29,6 +30,12 @@ type MongoDB struct {
 	AuthDB     string `yaml:"auth_db" env-required:"true"`
 	Database   string `yaml:"database" env-required:"true"`
 	Collection string `yaml:"collection" env-required:"true"`
+}
+
+type Redis struct {
+	Host     string `yaml:"host" env-required:"true"`
+	Port     string `yaml:"port" env-required:"true"`
+	Password string `yaml:"-" env:"REDIS_PASSWORD"`
 }
 
 var instance *Config
@@ -51,6 +58,7 @@ func GetConfig() *Config {
 		}
 
 		instance.MongoDB.Password = os.Getenv("MONGODB_PASSWORD")
+		instance.Redis.Password = os.Getenv("REDIS_PASSWORD")
 	})
 
 	return instance
