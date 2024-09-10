@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"time"
@@ -66,6 +67,17 @@ func (s *db) FindMany(ctx context.Context) ([]property.Property, error) {
 }
 
 func (s *db) FindOne(ctx context.Context, uuid string) (p property.Property, err error) {
+	//try to get from cache
+	cachedData, err := s.cache.Get(uuid)
+	if err == nil && cachedData != "" {
+		s.logger.Debug("cache hit")
+		var prop property.Property
+		if err := json.Unmarshal([]byte(cachedData), &prop); err == nil {
+			return prop, nil
+		}
+	}
+
+	//cache is empty, continue with mongodb
 	objectID, err := primitive.ObjectIDFromHex(uuid)
 	if err != nil {
 		return p, fmt.Errorf("failed to convert hex to objectid. error: %w", err)
@@ -86,6 +98,10 @@ func (s *db) FindOne(ctx context.Context, uuid string) (p property.Property, err
 	}
 	if err = result.Decode(&p); err != nil {
 		return p, fmt.Errorf("failed to decode document. error: %w", err)
+	}
+
+	if err := s.cache.Set(uuid, p, 10*time.Minute); err != nil {
+		s.logger.Error("failed to set cache:", err)
 	}
 
 	return p, nil
