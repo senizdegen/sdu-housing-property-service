@@ -14,6 +14,7 @@ type Config struct {
 	Listen  `yaml:"listen"`
 	MongoDB `yaml:"mongodb" env-required:"true"`
 	Redis   `yaml:"redis" env-required:"true"`
+	Minio   `yaml:"minio" env-required:"true"`
 }
 
 type Listen struct {
@@ -38,6 +39,15 @@ type Redis struct {
 	Password string `yaml:"-" env:"REDIS_PASSWORD"`
 }
 
+type Minio struct {
+	Host       string `yaml:"host" env-required:"true"`
+	Port       string `yaml:"port" env-required:"true"`
+	Username   string `yaml:"username" env-required:"true"`
+	Password   string `yaml:"-" env:"MINIO_PASSWORD"`
+	SSL        bool   `yaml:"ssl" env-default:"false"`
+	BucketName string `yaml:"bucket_name" env-required:"true"`
+}
+
 var instance *Config
 var once sync.Once
 
@@ -59,6 +69,7 @@ func GetConfig() *Config {
 
 		instance.MongoDB.Password = os.Getenv("MONGODB_PASSWORD")
 		instance.Redis.Password = os.Getenv("REDIS_PASSWORD")
+		instance.Minio.Password = os.Getenv("MINIO_PASSWORD")
 	})
 
 	return instance

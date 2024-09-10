@@ -16,6 +16,7 @@ import (
 	"github.com/senizdegen/sdu-housing/property-service/internal/config"
 	"github.com/senizdegen/sdu-housing/property-service/internal/property"
 	"github.com/senizdegen/sdu-housing/property-service/internal/property/db"
+	"github.com/senizdegen/sdu-housing/property-service/pkg/cloudstorage/minio"
 	"github.com/senizdegen/sdu-housing/property-service/pkg/handlers/metric"
 	"github.com/senizdegen/sdu-housing/property-service/pkg/logging"
 	mongo "github.com/senizdegen/sdu-housing/property-service/pkg/mongodb"
@@ -67,7 +68,16 @@ func main() {
 
 	redisCache := db.NewRedisCache(redisClient, logger)
 
-	propertyStorage := db.NewStorage(mongoClient, cfg.MongoDB.Collection, redisCache, logger)
+	minioClient, err := minio.NewClient(
+		cfg.Minio.Host,
+		cfg.Minio.Port,
+		cfg.Minio.Username,
+		cfg.Minio.Password,
+		cfg.Minio.SSL,
+	)
+
+	minioDB := db.NewMinio(minioClient, logger, cfg.Minio.BucketName)
+	propertyStorage := db.NewStorage(mongoClient, cfg.MongoDB.Collection, redisCache, minioDB, logger)
 	propertyService, err := property.NewService(propertyStorage, logger)
 	if err != nil {
 		logger.Fatal(err)

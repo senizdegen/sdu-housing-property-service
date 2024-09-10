@@ -22,13 +22,15 @@ type db struct {
 	collection *mongo.Collection
 	logger     logging.Logger
 	cache      RedisCache
+	minioDB    Minio
 }
 
-func NewStorage(storage *mongo.Database, collection string, cache RedisCache, logger logging.Logger) property.Storage {
+func NewStorage(storage *mongo.Database, collection string, cache RedisCache, minioDB Minio, logger logging.Logger) property.Storage {
 	return &db{
 		collection: storage.Collection(collection),
 		logger:     logger,
 		cache:      cache,
+		minioDB:    minioDB,
 	}
 }
 
