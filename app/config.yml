@@ -18,3 +18,4 @@ minio:
   port: 9000
   username: senizdegen
   ssl: false
+  bucket_name: "test"

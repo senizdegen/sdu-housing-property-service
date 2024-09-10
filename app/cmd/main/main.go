@@ -76,6 +76,12 @@ func main() {
 		cfg.Minio.SSL,
 	)
 
+	if err != nil {
+		logger.Fatal(err)
+	}
+	logger.Println("connected to minIO")
+	logger.Trace(minioClient)
+
 	minioDB := db.NewMinio(minioClient, logger, cfg.Minio.BucketName)
 	propertyStorage := db.NewStorage(mongoClient, cfg.MongoDB.Collection, redisCache, minioDB, logger)
 	propertyService, err := property.NewService(propertyStorage, logger)
